@@ -6,7 +6,9 @@ namespace Lab_2_13
 {
     class Program
     {
-        private const int LENGTH = 1000;
+        private const int LENGTH = 10000;
+        private const int ITERATIONS = 10;
+        private const int THREADS_COUNT = 3;
 
         static void Main(string[] args)
         {
@@ -19,45 +21,31 @@ namespace Lab_2_13
             else if ("-count".Equals(args[0]))
             {
                 var numbers = file.Read(args[1]);
-                int iterations = 10;
-                Console.WriteLine($"Iterations: {iterations}");
+                Console.WriteLine($"Iterations: {ITERATIONS}");
+                Console.WriteLine($"Threads: {THREADS_COUNT}");
 
-                Console.WriteLine($"Iterations: {iterations}\n");
-                var notParallelResult = Calculate(numbers, new PrefixSummator(), iterations);
+                var notParallelResult = Calculate(numbers, new PrefixSummator());
                 Console.WriteLine($"not parallel average: {notParallelResult.average} millisec");
                 file.Write(notParallelResult.prefixes, "result.txt");
 
-                var parallelResult = Calculate(numbers, new ParallelPrefixSummator(), iterations);
+                var parallelResult = Calculate(numbers, new ParallelPrefixSummator(THREADS_COUNT));
                 Console.WriteLine($"parallel average: {parallelResult.average} millisec");
                 file.Write(parallelResult.prefixes, "result_parallel.txt");
-            }
-            else if ("-test".Equals(args[0]))
-            {
-                var numbers = file.Read(args[1]);
-                int iterations = 10;
-                Console.WriteLine($"Iterations: {iterations}");
 
-                var notParallelResult = Calculate(numbers, new PrefixSummator(), iterations);
-                var parallelResult = Calculate(numbers, new ParallelPrefixSummator(), iterations);
-                for (int i = 0; i < notParallelResult.prefixes.Length; ++i)
-                {
-                    if (notParallelResult.prefixes[i] != parallelResult.prefixes[i])
-                    {
-                        Console.WriteLine("not match");
-                    }
-                }
+                double coefficient = notParallelResult.average / parallelResult.average;
+                Console.WriteLine($"coefficient: {coefficient:0.00}");
             }
             Console.WriteLine("done");
             Console.ReadKey(true);
         }
 
-        private static (double[] prefixes, double average) Calculate(double[] numbers, IPrefixSummator summator, int iterations)
+        private static (double[] prefixes, double average) Calculate(double[] numbers, IPrefixSummator summator)
         {
             double[] result = null;
 
             Stopwatch watch = new Stopwatch();
-            double[] milliseconds = new double[iterations];
-            for (int i = 0; i < iterations; ++i)
+            double[] milliseconds = new double[ITERATIONS];
+            for (int i = 0; i < ITERATIONS; ++i)
             {
                 watch.Reset();
                 watch.Start();
