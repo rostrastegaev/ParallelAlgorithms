@@ -52,11 +52,12 @@ namespace Lab_2_13
             using (var input = File.Create(file))
             using (var writer = new StreamWriter(input))
             {
-                for (int i = 499, j = 499, k = 0; i >= 0 && j < length; --i, ++j, ++k)
+                int middle = numbers.Length - 2;
+                for (int i = middle, j = middle, k = 0; i >= 0 && j < length; --i, ++j, ++k)
                 {
                     writer.WriteLine($"S[{i + 1}, {j + 1}] = {numbers[k]}");
                 }
-                writer.WriteLine($"S[1, 1000] = {numbers[numbers.Length - 1]}");
+                writer.WriteLine($"S[1, {length - 2}] = {numbers[numbers.Length - 1]}");
             }
         }
     }
